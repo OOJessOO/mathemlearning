@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  LYCEE
+  UNIVERSITAIRE
+  ADMIN
+}
+
+enum Niveau {
+  PREMIERE_C
+  TERMINALE_C
+  L1
+  L2
+  L3
+  L4
+  L5
+}
+
+enum Categorie {
+  LYCEE
+  UNIVERSITAIRE
+}
+
+enum AttemptStatus {
+  EN_COURS
+  TERMINE
+  ABANDONNE
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  role      Role
+  niveau    Niveau
+  avatarUrl String?
+  createdAt DateTime  @default(now())
+  attempts  Attempt[]
+}
+
+model Branch {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String
+  description String?
+  categorie   Categorie
+  order       Int        @default(0)
+  exercises   Exercise[]
+
+  @@unique([slug, categorie])
+}
+
+model Exercise {
+  id            Int       @id @default(autoincrement())
+  branchId      Int
+  branch        Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  title         String
+  enonce        String
+  dureeSecondes Int
+  points        Int       @default(20)
+  expectedAnswer String
+  correction    String
+  niveau        Niveau
+  unlockPoints  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  attempts      Attempt[]
+}
+
+model Attempt {
+  id         Int           @id @default(autoincrement())
+  userId     Int
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exerciseId Int
+  exercise   Exercise      @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  status     AttemptStatus @default(EN_COURS)
+  demarche   String?
+  reponse    String?
+  note       Float?
+  startedAt  DateTime      @default(now())
+  submittedAt DateTime?
+}
