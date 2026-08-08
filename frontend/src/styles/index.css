@@ -18,6 +18,11 @@
   box-sizing: border-box;
 }
 
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -479,6 +484,7 @@ select:focus {
 
 .branch-card {
   text-align: left;
+  color: var(--text);
   background: rgba(22, 29, 49, 0.8);
   border: 1px solid var(--border);
   border-radius: var(--radius);
