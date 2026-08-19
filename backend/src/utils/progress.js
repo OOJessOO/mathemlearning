@@ -1,7 +1,6 @@
 export function levelFromPoints(points) {
   const level = 1 + Math.floor(points / 100);
   const progressInLevel = points % 100;
-  const nextLevelAt = 100;
   return { level, pointsInLevel: progressInLevel, pointsForLevel: 100, progress: progressInLevel / 100 };
 }
 
@@ -27,8 +26,7 @@ export function streakFromDates(dates) {
 
 function dayKey(date) {
   const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function addDays(date, days) {

@@ -221,7 +221,8 @@ body {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px 22px;
-  min-width: 300px;
+  min-width: 0;
+  flex: 1;
   box-shadow: var(--shadow);
   backdrop-filter: blur(6px);
 }
@@ -247,6 +248,10 @@ body {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.progress {
+  margin-top: 12px;
 }
 
 .progress-track {
@@ -710,17 +715,15 @@ select:focus {
   padding: 8px 12px;
   width: 100%;
   color: var(--text);
+  touch-action: manipulation;
+  --ml-background-color: transparent;
+  --ml-foreground-color: var(--text);
+  --ml-selection-background-color: rgba(91, 124, 250, 0.4);
 }
 
 .math-input:focus-within {
   outline: 2px solid rgba(91, 124, 250, 0.35);
   border-color: var(--primary) !important;
-}
-
-.math-input {
-  --ml-background-color: transparent;
-  --ml-foreground-color: var(--text);
-  --ml-selection-background-color: rgba(91, 124, 250, 0.4);
 }
 
 .actions {
@@ -904,8 +907,8 @@ select:focus {
 @media (max-width: 640px) {
   .topbar {
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 10px 16px;
+    gap: 8px;
+    padding: 10px 12px;
   }
 
   .menu-toggle {
@@ -917,6 +920,26 @@ select:focus {
     margin-left: 0;
     width: 100%;
     justify-content: space-between;
+    gap: 6px;
+  }
+
+  .user-chip {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+  }
+
+  .avatar-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .btn.btn-ghost {
+    padding: 5px 10px;
+    font-size: 0.82rem;
   }
 
   .nav {

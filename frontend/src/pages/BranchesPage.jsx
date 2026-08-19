@@ -7,19 +7,20 @@ export default function BranchesPage() {
   const [branches, setBranches] = useState([]);
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
-    api('/api/branches')
-      .then((d) => setBranches(d.branches))
-      .catch((e) => setError(e.message));
-    api('/api/stats')
-      .then((d) => setStats(d.stats))
-      .catch((e) => setError(e.message));
+    Promise.all([
+      api('/api/branches').then((d) => setBranches(d.branches)),
+      api('/api/stats').then((d) => setStats(d.stats)),
+    ]).catch((e) => setError(e.message)).finally(() => setLoading(false));
   }, []);
 
   const pct = stats ? Math.round(stats.levelProgress * 100) : 0;
+
+  if (loading) return <p className="muted center-page">Chargement…</p>;
 
   return (
     <div>

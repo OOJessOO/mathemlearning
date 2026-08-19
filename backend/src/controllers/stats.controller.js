@@ -1,7 +1,8 @@
 import { AttemptModel } from '../models/attempt.model.js';
 import { levelFromPoints, streakFromDates } from '../utils/progress.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
-export async function getStats(req, res) {
+export const getStats = catchAsync(async (req, res) => {
   const attempts = await AttemptModel.listForStats(req.user.id);
 
   const totalPoints = attempts.reduce((sum, a) => sum + (a.note ?? 0), 0);
@@ -27,4 +28,4 @@ export async function getStats(req, res) {
       levelProgress: level.progress,
     },
   });
-}
+});

@@ -6,12 +6,17 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "db:push": "prisma db push",
-    "db:seed": "prisma db seed",
-    "db:migrate": "prisma migrate dev"
+    "postinstall": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:seed": "npx prisma db seed",
+    "db:migrate": "npx prisma migrate dev",
+    "render-start": "npx prisma db push --skip-generate && npx prisma db seed && node src/index.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@cortex-js/compute-engine": "^0.20.0",

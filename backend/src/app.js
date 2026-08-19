@@ -25,4 +25,9 @@ app.use('/api/stats', statsRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'Route introuvable' }));
 
+app.use((err, req, res, _next) => {
+  console.error('Erreur non gérée:', err);
+  res.status(500).json({ error: 'Erreur interne du serveur' });
+});
+
 export default app;

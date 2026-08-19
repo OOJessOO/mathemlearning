@@ -1,9 +1,18 @@
 import { ExerciseModel } from '../models/exercise.model.js';
 import { AttemptModel } from '../models/attempt.model.js';
 import { gradeAnswer } from '../utils/grading.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
-export async function startAttempt(req, res) {
-  const exerciseId = Number(req.params.exerciseId);
+function parseId(value) {
+  const id = Number(value);
+  return Number.isFinite(id) && Number.isInteger(id) ? id : null;
+}
+
+export const startAttempt = catchAsync(async (req, res) => {
+  const exerciseId = parseId(req.params.exerciseId);
+  if (exerciseId === null) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
   const [exercise, pointsAgg] = await Promise.all([
     ExerciseModel.findById(exerciseId),
     AttemptModel.totalPoints(req.user.id),
@@ -17,26 +26,27 @@ export async function startAttempt(req, res) {
     });
   }
 
-  const existing = await AttemptModel.findActiveByExercise(req.user.id, exerciseId);
-  if (existing) {
-    return res.json({ attempt: serializeAttempt(existing, exercise) });
+  const { attempt } = await AttemptModel.findOrCreateActive(req.user.id, exerciseId);
+  return res.json({ attempt: serializeAttempt(attempt, exercise) });
+});
+
+export const getAttempt = catchAsync(async (req, res) => {
+  const id = parseId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'ID invalide' });
   }
-
-  const attempt = await AttemptModel.create(req.user.id, exerciseId);
-  return res.status(201).json({ attempt: serializeAttempt(attempt, exercise) });
-}
-
-export async function getAttempt(req, res) {
-  const id = Number(req.params.id);
   const attempt = await AttemptModel.findByIdWithExercise(id);
   if (!attempt) return res.status(404).json({ error: 'Tentative introuvable' });
   if (attempt.userId !== req.user.id) return res.status(403).json({ error: 'Accès refusé' });
 
   return res.json({ attempt: serializeAttempt(attempt, attempt.exercise) });
-}
+});
 
-export async function submitAttempt(req, res) {
-  const id = Number(req.params.id);
+export const submitAttempt = catchAsync(async (req, res) => {
+  const id = parseId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
   const { demarche, reponse } = req.body;
 
   const attempt = await AttemptModel.findByIdWithExercise(id);
@@ -55,11 +65,14 @@ export async function submitAttempt(req, res) {
     attempt: serializeAttempt(updated, attempt.exercise),
     grade: { note, correct: result.correct, max: attempt.exercise.points, reason: result.reason },
   });
-}
+});
 
-export async function abandonAttempt(req, res) {
-  const id = Number(req.params.id);
-  const attempt = await AttemptModel.findById(id);
+export const abandonAttempt = catchAsync(async (req, res) => {
+  const id = parseId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
+  const attempt = await AttemptModel.findByIdWithExercise(id);
   if (!attempt) return res.status(404).json({ error: 'Tentative introuvable' });
   if (attempt.userId !== req.user.id) return res.status(403).json({ error: 'Accès refusé' });
   if (attempt.status !== 'EN_COURS') {
@@ -67,11 +80,14 @@ export async function abandonAttempt(req, res) {
   }
 
   const updated = await AttemptModel.abandon(id);
-  return res.json({ attempt: serializeAttempt(updated) });
-}
+  return res.json({ attempt: serializeAttempt(updated, attempt.exercise) });
+});
 
-export async function getResult(req, res) {
-  const id = Number(req.params.id);
+export const getResult = catchAsync(async (req, res) => {
+  const id = parseId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
   const attempt = await AttemptModel.findByIdWithExercise(id);
   if (!attempt) return res.status(404).json({ error: 'Tentative introuvable' });
   if (attempt.userId !== req.user.id) return res.status(403).json({ error: 'Accès refusé' });
@@ -89,9 +105,9 @@ export async function getResult(req, res) {
     },
     correction: attempt.exercise.correction,
   });
-}
+});
 
-export async function listHistory(req, res) {
+export const listHistory = catchAsync(async (req, res) => {
   const attempts = await AttemptModel.listForUser(req.user.id);
   return res.json({
     attempts: attempts.map((a) => ({
@@ -104,7 +120,7 @@ export async function listHistory(req, res) {
       startedAt: a.startedAt,
     })),
   });
-}
+});
 
 function serializeAttempt(attempt, exercise = null) {
   return {

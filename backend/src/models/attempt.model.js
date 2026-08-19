@@ -7,6 +7,17 @@ export const AttemptModel = {
     });
   },
 
+  findOrCreateActive(userId, exerciseId) {
+    return prisma.$transaction(async (tx) => {
+      const existing = await tx.attempt.findFirst({
+        where: { userId, exerciseId, status: 'EN_COURS' },
+      });
+      if (existing) return { attempt: existing, created: false };
+      const attempt = await tx.attempt.create({ data: { userId, exerciseId } });
+      return { attempt, created: true };
+    });
+  },
+
   findById(id) {
     return prisma.attempt.findUnique({ where: { id } });
   },

@@ -3,7 +3,8 @@ export async function api(path, { method = 'GET', body, token } = {}) {
   const tok = token || localStorage.getItem('ml_token');
   if (tok) headers.Authorization = `Bearer ${tok}`;
 
-  const res = await fetch(`${path}`, {
+  const base = import.meta.env.VITE_API_URL || '';
+  const res = await fetch(`${base}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,

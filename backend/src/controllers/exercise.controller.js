@@ -1,12 +1,14 @@
 import { ExerciseModel } from '../models/exercise.model.js';
 import { AttemptModel } from '../models/attempt.model.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
-export async function listExercises(req, res) {
+export const listExercises = catchAsync(async (req, res) => {
   const { branch } = req.query;
   const categorie = req.user.role === 'LYCEE' ? 'LYCEE' : 'UNIVERSITAIRE';
 
   const [exercises, pointsAgg] = await Promise.all([
     ExerciseModel.findMany({
+      userId: req.user.id,
       niveau: req.user.niveau,
       branchSlug: branch,
       categorie,
@@ -29,10 +31,13 @@ export async function listExercises(req, res) {
       unlocked: totalPoints >= e.unlockPoints,
     })),
   });
-}
+});
 
-export async function getExercise(req, res) {
+export const getExercise = catchAsync(async (req, res) => {
   const id = Number(req.params.id);
+  if (!Number.isFinite(id) || !Number.isInteger(id)) {
+    return res.status(400).json({ error: 'ID invalide' });
+  }
   const [exercise, pointsAgg] = await Promise.all([
     ExerciseModel.findById(id),
     AttemptModel.totalPoints(req.user.id),
@@ -51,4 +56,4 @@ export async function getExercise(req, res) {
     unlockPoints: exercise.unlockPoints,
     unlocked: totalPoints >= exercise.unlockPoints,
   });
-}
+});

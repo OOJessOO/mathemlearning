@@ -1,7 +1,7 @@
 import { prisma } from '../config/prisma.js';
 
 export const ExerciseModel = {
-  findMany({ niveau, branchSlug, categorie }) {
+  findMany({ userId, niveau, branchSlug, categorie }) {
     return prisma.exercise.findMany({
       where: {
         niveau,
@@ -9,7 +9,7 @@ export const ExerciseModel = {
       },
       include: {
         branch: true,
-        attempts: { where: { status: 'TERMINE' }, select: { id: true } },
+        attempts: { where: { status: 'TERMINE', userId }, select: { id: true } },
       },
       orderBy: { createdAt: 'asc' },
     });

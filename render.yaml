@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mathemlearning-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx prisma db push --skip-generate && npx prisma db seed && node src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        value: https://mathemlearning.vercel.app
+      - key: PORT
+        value: 4000
