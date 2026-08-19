@@ -45,11 +45,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="auth-alt">
-          Pas encore de compte ? <Link to="/register">S’inscrire</Link>
-        </p>
-        <p className="auth-demo">
-          Démo : <code>eleve@mathemlearning.fr</code> ou <code>etudiant@mathemlearning.fr</code> —
-          mot de passe <code>password123</code>
+          Pas encore de compte ? <Link to="/register">S'inscrire</Link>
         </p>
       </div>
     </div>
